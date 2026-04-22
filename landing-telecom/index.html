@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<title>Telecom S.A.</title>
+
+<style>
+.hero-gradient {
+  background: linear-gradient(135deg, rgba(0,23,54,0.95), rgba(0,43,92,0.85));
+}
+</style>
+
+</head>
+
+<body class="bg-gray-50 font-sans">
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full bg-white shadow z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <h1 class="font-bold text-xl text-blue-900">Telecom S.A.</h1>
+    <a href="#contacto" class="bg-blue-600 text-white px-5 py-2 rounded-lg">Contáctanos</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="pt-24 min-h-screen flex items-center relative">
+  <div class="absolute inset-0">
+    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0">
+    <div class="absolute inset-0 hero-gradient"></div>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-6 text-white">
+    <h2 class="text-4xl md:text-5xl font-bold mb-6">
+      Soluciones en Telecomunicaciones para Empresas
+    </h2>
+
+    <p class="max-w-xl mb-8 text-lg opacity-90">
+      Instalación, mantenimiento y soporte técnico especializado para optimizar la conectividad empresarial.
+    </p>
+
+    <button onclick="scrollToForm()" class="bg-blue-500 px-8 py-4 rounded-xl font-semibold">
+      Solicitar servicio
+    </button>
+  </div>
+</section>
+
+<!-- SOBRE LA EMPRESA -->
+<section class="py-20 max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+  
+  <div>
+    <h2 class="text-3xl font-bold mb-6 text-blue-900">Sobre la empresa</h2>
+
+    <p class="text-gray-600 mb-4">
+      Telecom S.A. es una empresa especializada en servicios de telecomunicaciones orientados al sector empresarial, enfocada en la instalación, mantenimiento y soporte de redes.
+    </p>
+
+    <p class="text-gray-600">
+      Su enfoque principal es garantizar conectividad eficiente y confiable, apoyando a empresas del sector en la ejecución de proyectos técnicos de alta demanda.
+    </p>
+  </div>
+
+  <img class="rounded-xl shadow" src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31">
+</section>
+
+<!-- SERVICIOS -->
+<section class="bg-white py-20">
+  <div class="max-w-7xl mx-auto px-6 text-center mb-12">
+    <h2 class="text-3xl font-bold text-blue-900">Nuestros Servicios</h2>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto px-6">
+
+    <div class="p-6 border rounded-xl hover:shadow-lg">
+      <h3 class="font-bold text-xl mb-3">Instalación de redes</h3>
+      <p class="text-gray-600">
+        Implementación de infraestructura de telecomunicaciones, incluyendo fibra óptica y equipos de conectividad, asegurando calidad y estabilidad en cada proyecto.
+      </p>
+    </div>
+
+    <div class="p-6 border rounded-xl hover:shadow-lg">
+      <h3 class="font-bold text-xl mb-3">Mantenimiento técnico</h3>
+      <p class="text-gray-600">
+        Servicios preventivos y correctivos que garantizan la continuidad operativa de las redes y reducen fallas técnicas.
+      </p>
+    </div>
+
+    <div class="p-6 border rounded-xl hover:shadow-lg">
+      <h3 class="font-bold text-xl mb-3">Soporte técnico</h3>
+      <p class="text-gray-600">
+        Atención rápida de incidencias, permitiendo mantener la eficiencia del servicio y minimizar interrupciones.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- COMO TRABAJAMOS -->
+<section class="py-20 bg-gray-100">
+  <div class="max-w-5xl mx-auto px-6 text-center">
+
+    <h2 class="text-3xl font-bold text-blue-900 mb-6">¿Cómo trabajamos?</h2>
+
+    <p class="text-gray-600 mb-4">
+      Telecom S.A. colabora con empresas del sector como <strong>Claro Nicaragua</strong>, participando en la instalación, mantenimiento y expansión de redes de telecomunicaciones.
+    </p>
+
+    <p class="text-gray-600">
+      El trabajo se realiza mediante órdenes técnicas, gestión de recursos y ejecución en campo, garantizando cumplimiento de tiempos, calidad del servicio y soporte continuo.
+    </p>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-20 text-center">
+  <h2 class="text-3xl font-bold mb-6 text-blue-900">
+    Optimiza tus operaciones con expertos
+  </h2>
+
+  <button onclick="scrollToForm()" class="bg-blue-600 text-white px-8 py-4 rounded-xl">
+    Contáctanos ahora
+  </button>
+</section>
+
+<!-- FORMULARIO -->
+<section id="contacto" class="py-20 bg-gray-100">
+  <div class="max-w-xl mx-auto px-6">
+
+    <h2 class="text-2xl font-bold text-center mb-6 text-blue-900">Contáctanos</h2>
+
+    <form id="form" class="space-y-4">
+
+      <input type="text" placeholder="Empresa" class="w-full p-3 border rounded-lg" required>
+      <input type="text" placeholder="Nombre" class="w-full p-3 border rounded-lg" required>
+      <input type="email" placeholder="Correo" class="w-full p-3 border rounded-lg" required>
+      <input type="tel" placeholder="Teléfono" class="w-full p-3 border rounded-lg" required>
+
+      <textarea placeholder="Mensaje" class="w-full p-3 border rounded-lg"></textarea>
+
+      <button class="w-full bg-blue-600 text-white py-3 rounded-lg">
+        Enviar
+      </button>
+
+    </form>
+
+    <p id="msg" class="text-center mt-4"></p>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="text-center py-6 bg-white">
+  <p>© Telecom S.A.</p>
+</footer>
+
+<script>
+function scrollToForm(){
+  document.getElementById("contacto").scrollIntoView({behavior:"smooth"});
+}
+
+document.getElementById("form").addEventListener("submit", function(e){
+  e.preventDefault();
+  document.getElementById("msg").innerText = "Mensaje enviado correctamente";
+});
+</script>
+
+</body>
+</html>
