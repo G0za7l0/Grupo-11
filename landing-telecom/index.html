@@ -1,171 +1,586 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telecom S.A. | Conectividad Empresarial de Excelencia</title>
+  <meta name="description" content="Especialistas en instalación, mantenimiento y soporte de redes. Garantizamos conectividad eficiente y confiable para tu empresa.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              900: '#0c4a6e',
+              950: '#082f49',
+            },
+            accent: {
+              500: '#38bdf8',
+            }
+          }
+        }
+      }
+    }
+  </script>
 
-<script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-<title>Telecom S.A.</title>
+  <style>
+    body {
+      background-color: #fafafa;
+      color: #0f172a;
+    }
+    
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+    }
 
-<style>
-.hero-gradient {
-  background: linear-gradient(135deg, rgba(0,23,54,0.95), rgba(0,43,92,0.85));
-}
-</style>
+    .hero-bg {
+      background: linear-gradient(135deg, #0f172a 0%, #0c4a6e 100%);
+      position: relative;
+      overflow: hidden;
+    }
 
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(56,189,248,0.1) 0%, transparent 50%);
+      animation: rotate 30s linear infinite;
+    }
+    
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 150px;
+      background: linear-gradient(to top, #fafafa, transparent);
+      z-index: 10;
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .float-anim {
+      animation: float 6s ease-in-out infinite;
+    }
+    .float-anim-delay {
+      animation: float 6s ease-in-out infinite 3s;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .card-hover {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px -10px rgba(2, 132, 199, 0.15);
+      border-color: #bae6fd;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(to right, #0ea5e9, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .blob {
+      position: absolute;
+      filter: blur(60px);
+      z-index: 0;
+      opacity: 0.5;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+    }
+  </style>
 </head>
-
-<body class="bg-gray-50 font-sans">
+<body class="antialiased selection:bg-brand-500 selection:text-white">
 
 <!-- NAV -->
-<nav class="fixed top-0 w-full bg-white shadow z-50">
+<nav class="fixed top-0 w-full glass-nav z-50 transition-all duration-300" id="navbar">
   <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-    <h1 class="font-bold text-xl text-blue-900">Telecom S.A.</h1>
-    <a href="#contacto" class="bg-blue-600 text-white px-5 py-2 rounded-lg">Contáctanos</a>
+    <div class="flex items-center gap-2">
+      <div class="bg-gradient-to-tr from-brand-600 to-accent-500 text-white p-2 rounded-lg">
+        <i data-lucide="network" class="w-6 h-6"></i>
+      </div>
+      <h1 class="font-display font-bold text-2xl text-brand-950 tracking-tight">Telecom<span class="text-brand-500">S.A.</span></h1>
+    </div>
+    <div class="hidden md:flex gap-8 text-sm font-medium text-slate-600">
+      <a href="#empresa" class="hover:text-brand-600 transition-colors">Empresa</a>
+      <a href="#servicios" class="hover:text-brand-600 transition-colors">Servicios</a>
+      <a href="#diferenciadores" class="hover:text-brand-600 transition-colors">Por qué elegirnos</a>
+    </div>
+    <a href="#contacto" class="hidden md:inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-500 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 hover:-translate-y-0.5">
+      Cotizar ahora
+      <i data-lucide="arrow-right" class="w-4 h-4"></i>
+    </a>
+    <button class="md:hidden text-slate-700">
+      <i data-lucide="menu" class="w-6 h-6"></i>
+    </button>
   </div>
 </nav>
 
 <!-- HERO -->
-<section class="pt-24 min-h-screen flex items-center relative">
-  <div class="absolute inset-0">
-    <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0">
-    <div class="absolute inset-0 hero-gradient"></div>
-  </div>
-
-  <div class="relative z-10 max-w-7xl mx-auto px-6 text-white">
-    <h2 class="text-4xl md:text-5xl font-bold mb-6">
-      Soluciones en Telecomunicaciones para Empresas
-    </h2>
-
-    <p class="max-w-xl mb-8 text-lg opacity-90">
-      Instalación, mantenimiento y soporte técnico especializado para optimizar la conectividad empresarial.
-    </p>
-
-    <button onclick="scrollToForm()" class="bg-blue-500 px-8 py-4 rounded-xl font-semibold">
-      Solicitar servicio
-    </button>
+<section class="hero-bg min-h-screen flex items-center relative pt-20">
+  <div class="relative z-20 max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center w-full">
+    
+    <div class="text-white text-center lg:text-left">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6 text-sm font-medium text-brand-100 reveal">
+        <span class="w-2 h-2 rounded-full bg-accent-500 animate-pulse"></span>
+        Innovación en Conectividad
+      </div>
+      
+      <h2 class="font-display text-5xl lg:text-7xl font-extrabold mb-6 leading-tight tracking-tight reveal" style="transition-delay: 100ms;">
+        Impulsamos tu <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent-500 to-brand-100">Infraestructura</span> Digital
+      </h2>
+      
+      <p class="text-lg lg:text-xl text-slate-300 mb-10 max-w-xl mx-auto lg:mx-0 font-light leading-relaxed reveal" style="transition-delay: 200ms;">
+        Soluciones integrales de telecomunicaciones para empresas que exigen rendimiento, estabilidad y soporte de primer nivel.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start reveal" style="transition-delay: 300ms;">
+        <button onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})" class="bg-white text-brand-900 hover:bg-brand-50 px-8 py-4 rounded-full font-semibold text-lg transition-all shadow-xl shadow-white/10 hover:shadow-white/20 hover:-translate-y-1 flex items-center justify-center gap-2">
+          Transformar mi red
+          <i data-lucide="zap" class="w-5 h-5 text-brand-500"></i>
+        </button>
+        <a href="#servicios" class="px-8 py-4 rounded-full font-semibold text-lg text-white border border-white/20 hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+          Explorar servicios
+        </a>
+      </div>
+      
+      <div class="mt-12 flex items-center justify-center lg:justify-start gap-4 text-sm text-slate-400 reveal" style="transition-delay: 400ms;">
+        <div class="flex -space-x-2">
+          <img class="w-8 h-8 rounded-full border-2 border-brand-900 object-cover" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80" alt="Client">
+          <img class="w-8 h-8 rounded-full border-2 border-brand-900 object-cover" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=100&q=80" alt="Client">
+          <img class="w-8 h-8 rounded-full border-2 border-brand-900 object-cover" src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=100&q=80" alt="Client">
+        </div>
+        <p>Confianza de más de <strong class="text-white">200+ empresas</strong></p>
+      </div>
+    </div>
+    
+    <div class="relative hidden lg:block reveal" style="transition-delay: 300ms;">
+      <div class="absolute inset-0 bg-gradient-to-tr from-brand-500 to-accent-500 rounded-3xl transform rotate-3 scale-105 opacity-20 blur-xl"></div>
+      <img src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80" alt="Telecom Infrastructure" class="relative z-10 rounded-3xl shadow-2xl border border-white/10 float-anim object-cover h-[600px] w-full">
+      
+      <!-- Floating Badge -->
+      <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 z-20 float-anim-delay flex items-center gap-4">
+        <div class="bg-green-100 p-3 rounded-full text-green-600">
+          <i data-lucide="shield-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Garantía</p>
+          <p class="text-brand-950 font-bold">99.9% Uptime</p>
+        </div>
+      </div>
+    </div>
+    
   </div>
 </section>
 
-<!-- SOBRE LA EMPRESA -->
-<section class="py-20 max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+<!-- SOBRE LA EMPRESA & PROPUESTA DE VALOR -->
+<section id="empresa" class="py-24 relative overflow-hidden">
+  <div class="blob bg-brand-100 w-96 h-96 rounded-full -top-20 -left-20"></div>
+  <div class="max-w-7xl mx-auto px-6 relative z-10">
+    
+    <div class="text-center max-w-3xl mx-auto mb-16 reveal">
+      <h3 class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3">Nuestra Esencia</h3>
+      <h2 class="font-display text-4xl md:text-5xl font-bold text-brand-950 mb-6">Conectando el futuro de los negocios</h2>
+      <p class="text-lg text-slate-600 leading-relaxed">
+        En <strong class="text-brand-900">Telecom S.A.</strong> no solo tiramos cables; construimos las arterias por donde fluye la información de tu empresa. Nuestra propuesta de valor se basa en la <span class="gradient-text font-semibold">ingeniería de precisión, la respuesta inmediata y la escalabilidad</span>.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="glass-card p-8 rounded-2xl card-hover reveal" style="transition-delay: 100ms;">
+        <div class="w-14 h-14 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600 mb-6">
+          <i data-lucide="target" class="w-7 h-7"></i>
+        </div>
+        <h3 class="text-xl font-bold text-brand-950 mb-3">Misión</h3>
+        <p class="text-slate-600 leading-relaxed">Garantizar una conectividad empresarial eficiente y confiable, ejecutando proyectos técnicos de alta demanda con excelencia operativa.</p>
+      </div>
+      
+      <div class="glass-card p-8 rounded-2xl card-hover reveal" style="transition-delay: 200ms;">
+        <div class="w-14 h-14 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600 mb-6">
+          <i data-lucide="lightbulb" class="w-7 h-7"></i>
+        </div>
+        <h3 class="text-xl font-bold text-brand-950 mb-3">Visión</h3>
+        <p class="text-slate-600 leading-relaxed">Ser el socio estratégico líder en infraestructura tecnológica, empoderando la transformación digital de nuestros clientes.</p>
+      </div>
+
+      <div class="glass-card p-8 rounded-2xl card-hover reveal" style="transition-delay: 300ms;">
+        <div class="w-14 h-14 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600 mb-6">
+          <i data-lucide="gem" class="w-7 h-7"></i>
+        </div>
+        <h3 class="text-xl font-bold text-brand-950 mb-3">Valores</h3>
+        <p class="text-slate-600 leading-relaxed">Innovación constante, compromiso inquebrantable con la calidad, integridad profesional y orientación absoluta al cliente.</p>
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+<!-- NUESTROS SERVICIOS -->
+<section id="servicios" class="py-24 bg-white relative">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex flex-col md:flex-row justify-between items-end mb-16 reveal">
+      <div class="max-w-2xl">
+        <h3 class="text-brand-600 font-semibold tracking-wider uppercase text-sm mb-3">Soluciones Integrales</h3>
+        <h2 class="font-display text-4xl md:text-5xl font-bold text-brand-950">Nuestros Servicios</h2>
+      </div>
+      <p class="text-slate-600 max-w-md mt-4 md:mt-0">
+        Diseñamos, implementamos y mantenemos la infraestructura que mantiene tu negocio operando al 100%.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Servicio 1 -->
+      <div class="group border border-slate-200 rounded-3xl p-8 hover:border-brand-500 hover:shadow-2xl hover:shadow-brand-500/10 transition-all duration-300 reveal">
+        <div class="bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-500 group-hover:text-white transition-colors duration-300 text-brand-600">
+          <i data-lucide="cable" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-display font-bold text-2xl text-brand-950 mb-4">Instalación de Redes</h3>
+        <p class="text-slate-600 mb-6 line-clamp-3">
+          Implementación de infraestructura de fibra óptica y cableado estructurado. Diseños a medida que aseguran ancho de banda, calidad y estabilidad para el futuro de tu empresa.
+        </p>
+        <ul class="space-y-2 mb-8">
+          <li class="flex items-center gap-2 text-sm text-slate-700"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500"></i> Fibra Óptica</li>
+          <li class="flex items-center gap-2 text-sm text-slate-700"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500"></i> Cableado Estructurado</li>
+          <li class="flex items-center gap-2 text-sm text-slate-700"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500"></i> Certificación de Redes</li>
+        </ul>
+      </div>
+
+      <!-- Servicio 2 -->
+      <div class="group border border-slate-200 rounded-3xl p-8 hover:border-brand-500 hover:shadow-2xl hover:shadow-brand-500/10 transition-all duration-300 reveal" style="transition-delay: 100ms;">
+        <div class="bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-500 group-hover:text-white transition-colors duration-300 text-brand-600">
+          <i data-lucide="wrench" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-display font-bold text-2xl text-brand-950 mb-4">Mantenimiento Técnico</h3>
+        <p class="text-slate-600 mb-6 line-clamp-3">
+          Servicios preventivos y correctivos programados. Minimizamos el riesgo de fallas técnicas y extendemos la vida útil de tu equipamiento de telecomunicaciones.
+        </p>
+        <ul class="space-y-2 mb-8">
+          <li class="flex items-center gap-2 text-sm text-slate-700"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500"></i> Mantenimiento Preventivo</li>
+          <li class="flex items-center gap-2 text-sm text-slate-700"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500"></i> Diagnóstico de Fallas</li>
+          <li class="flex items-center gap-2 text-sm text-slate-700"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500"></i> Optimización de Equipos</li>
+        </ul>
+      </div>
+
+      <!-- Servicio 3 -->
+      <div class="group border border-slate-200 rounded-3xl p-8 hover:border-brand-500 hover:shadow-2xl hover:shadow-brand-500/10 transition-all duration-300 reveal" style="transition-delay: 200ms;">
+        <div class="bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-brand-500 group-hover:text-white transition-colors duration-300 text-brand-600">
+          <i data-lucide="headset" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-display font-bold text-2xl text-brand-950 mb-4">Soporte Especializado</h3>
+        <p class="text-slate-600 mb-6 line-clamp-3">
+          Atención rápida e inmediata de incidencias críticas. Un equipo de ingenieros listos para actuar y reducir al mínimo cualquier interrupción en tus operaciones.
+        </p>
+        <ul class="space-y-2 mb-8">
+          <li class="flex items-center gap-2 text-sm text-slate-700"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500"></i> Soporte 24/7</li>
+          <li class="flex items-center gap-2 text-sm text-slate-700"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500"></i> Resolución Remota</li>
+          <li class="flex items-center gap-2 text-sm text-slate-700"><i data-lucide="check-circle-2" class="w-4 h-4 text-accent-500"></i> Asistencia en Sitio (SLA)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFERENCIADORES -->
+<section id="diferenciadores" class="py-24 bg-slate-900 text-white relative overflow-hidden">
+  <!-- Decorative background elements -->
+  <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-600 rounded-full blur-[120px] opacity-20 transform translate-x-1/2 -translate-y-1/2"></div>
+  <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-accent-500 rounded-full blur-[100px] opacity-20 transform -translate-x-1/2 translate-y-1/2"></div>
   
-  <div>
-    <h2 class="text-3xl font-bold mb-6 text-blue-900">Sobre la empresa</h2>
-
-    <p class="text-gray-600 mb-4">
-      Telecom S.A. es una empresa especializada en servicios de telecomunicaciones orientados al sector empresarial, enfocada en la instalación, mantenimiento y soporte de redes.
-    </p>
-
-    <p class="text-gray-600">
-      Su enfoque principal es garantizar conectividad eficiente y confiable, apoyando a empresas del sector en la ejecución de proyectos técnicos de alta demanda.
-    </p>
-  </div>
-
-  <img class="rounded-xl shadow" src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31">
-</section>
-
-<!-- SERVICIOS -->
-<section class="bg-white py-20">
-  <div class="max-w-7xl mx-auto px-6 text-center mb-12">
-    <h2 class="text-3xl font-bold text-blue-900">Nuestros Servicios</h2>
-  </div>
-
-  <div class="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto px-6">
-
-    <div class="p-6 border rounded-xl hover:shadow-lg">
-      <h3 class="font-bold text-xl mb-3">Instalación de redes</h3>
-      <p class="text-gray-600">
-        Implementación de infraestructura de telecomunicaciones, incluyendo fibra óptica y equipos de conectividad, asegurando calidad y estabilidad en cada proyecto.
+  <div class="max-w-7xl mx-auto px-6 relative z-10">
+    <div class="text-center max-w-3xl mx-auto mb-16 reveal">
+      <h2 class="font-display text-4xl md:text-5xl font-bold mb-6">¿Por qué elegir <span class="text-accent-500">Telecom S.A.</span>?</h2>
+      <p class="text-xl text-slate-300">
+        No somos un proveedor más. Somos el socio tecnológico que acompaña el crecimiento de tu empresa.
       </p>
     </div>
 
-    <div class="p-6 border rounded-xl hover:shadow-lg">
-      <h3 class="font-bold text-xl mb-3">Mantenimiento técnico</h3>
-      <p class="text-gray-600">
-        Servicios preventivos y correctivos que garantizan la continuidad operativa de las redes y reducen fallas técnicas.
-      </p>
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div class="space-y-8">
+        <div class="flex gap-4 reveal">
+          <div class="flex-shrink-0 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center border border-white/20 text-accent-500">
+            <i data-lucide="briefcase" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold mb-2">Experiencia Corporativa</h4>
+            <p class="text-slate-400">Colaboramos con gigantes del sector como <strong>Claro Nicaragua</strong>. Conocemos los estándares más exigentes de la industria corporativa.</p>
+          </div>
+        </div>
+        
+        <div class="flex gap-4 reveal" style="transition-delay: 100ms;">
+          <div class="flex-shrink-0 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center border border-white/20 text-accent-500">
+            <i data-lucide="clock" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold mb-2">Tiempos de Respuesta</h4>
+            <p class="text-slate-400">Gestión ágil de órdenes técnicas y recursos de campo. Actuamos rápido porque sabemos que en tu negocio, el tiempo es dinero.</p>
+          </div>
+        </div>
+        
+        <div class="flex gap-4 reveal" style="transition-delay: 200ms;">
+          <div class="flex-shrink-0 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center border border-white/20 text-accent-500">
+            <i data-lucide="shield" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h4 class="text-xl font-bold mb-2">Garantía de Calidad</h4>
+            <p class="text-slate-400">Personal altamente capacitado y herramientas de última generación aseguran instalaciones impecables y duraderas.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="relative reveal" style="transition-delay: 300ms;">
+        <div class="absolute inset-0 bg-gradient-to-tr from-brand-500 to-accent-500 rounded-3xl transform -rotate-3 scale-105 opacity-50 blur-lg"></div>
+        <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80" alt="Ingenieros trabajando" class="relative z-10 rounded-3xl shadow-2xl border border-white/10 w-full object-cover h-[500px]">
+      </div>
     </div>
-
-    <div class="p-6 border rounded-xl hover:shadow-lg">
-      <h3 class="font-bold text-xl mb-3">Soporte técnico</h3>
-      <p class="text-gray-600">
-        Atención rápida de incidencias, permitiendo mantener la eficiencia del servicio y minimizar interrupciones.
-      </p>
-    </div>
-
   </div>
 </section>
 
-<!-- COMO TRABAJAMOS -->
-<section class="py-20 bg-gray-100">
-  <div class="max-w-5xl mx-auto px-6 text-center">
+<!-- CTA & FORMULARIO DE CAPTURA -->
+<section id="contacto" class="py-24 bg-brand-50 relative overflow-hidden">
+  <div class="blob bg-brand-200 w-96 h-96 rounded-full bottom-0 right-0"></div>
+  
+  <div class="max-w-7xl mx-auto px-6 relative z-10">
+    <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-brand-900/5 border border-slate-100 overflow-hidden">
+      <div class="grid lg:grid-cols-5">
+        
+        <!-- CTA Info -->
+        <div class="lg:col-span-2 bg-brand-900 text-white p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-64 h-64 bg-brand-600 rounded-full blur-[80px] opacity-50 transform translate-x-1/2 -translate-y-1/2"></div>
+          
+          <div class="relative z-10">
+            <h2 class="font-display text-3xl md:text-4xl font-bold mb-6">Da el siguiente paso hacia la excelencia.</h2>
+            <p class="text-brand-100 mb-12 text-lg">
+              Deja tus datos y uno de nuestros ingenieros expertos te contactará en menos de 24 horas para evaluar tus necesidades.
+            </p>
+            
+            <div class="space-y-6">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                  <i data-lucide="phone" class="w-5 h-5 text-accent-500"></i>
+                </div>
+                <div>
+                  <p class="text-sm text-brand-200">Llámanos</p>
+                  <p class="font-semibold">+505 2200-XXXX</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                  <i data-lucide="mail" class="w-5 h-5 text-accent-500"></i>
+                </div>
+                <div>
+                  <p class="text-sm text-brand-200">Escríbenos</p>
+                  <p class="font-semibold">contacto@telecom.com.ni</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                  <i data-lucide="map-pin" class="w-5 h-5 text-accent-500"></i>
+                </div>
+                <div>
+                  <p class="text-sm text-brand-200">Ubicación</p>
+                  <p class="font-semibold">Managua, Nicaragua</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <h2 class="text-3xl font-bold text-blue-900 mb-6">¿Cómo trabajamos?</h2>
+        <!-- Formulario -->
+        <div class="lg:col-span-3 p-12 lg:p-16">
+          <h3 class="font-display text-2xl font-bold text-brand-950 mb-8">Solicitar Evaluación Técnica Gratuita</h3>
+          
+          <form id="form" class="space-y-6">
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-slate-700">Nombre completo</label>
+                <input type="text" placeholder="Ej. Juan Pérez" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl transition-all" required>
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-slate-700">Empresa</label>
+                <input type="text" placeholder="Nombre de tu empresa" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl transition-all" required>
+              </div>
+            </div>
 
-    <p class="text-gray-600 mb-4">
-      Telecom S.A. colabora con empresas del sector como <strong>Claro Nicaragua</strong>, participando en la instalación, mantenimiento y expansión de redes de telecomunicaciones.
-    </p>
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-slate-700">Correo corporativo</label>
+                <input type="email" placeholder="juan@empresa.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl transition-all" required>
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-slate-700">Teléfono</label>
+                <input type="tel" placeholder="+505 XXXXXXXX" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl transition-all" required>
+              </div>
+            </div>
 
-    <p class="text-gray-600">
-      El trabajo se realiza mediante órdenes técnicas, gestión de recursos y ejecución en campo, garantizando cumplimiento de tiempos, calidad del servicio y soporte continuo.
-    </p>
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-slate-700">¿En qué podemos ayudarte?</label>
+              <textarea rows="4" placeholder="Describe brevemente tus necesidades de red o el proyecto en mente..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl transition-all resize-none"></textarea>
+            </div>
 
-  </div>
-</section>
+            <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white py-4 rounded-xl font-semibold text-lg transition-all shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 hover:-translate-y-0.5 flex items-center justify-center gap-2">
+              Enviar Solicitud
+              <i data-lucide="send" class="w-5 h-5"></i>
+            </button>
+            <p id="msg" class="text-center mt-4 font-medium text-green-600 hidden"></p>
+          </form>
+        </div>
 
-<!-- CTA -->
-<section class="py-20 text-center">
-  <h2 class="text-3xl font-bold mb-6 text-blue-900">
-    Optimiza tus operaciones con expertos
-  </h2>
-
-  <button onclick="scrollToForm()" class="bg-blue-600 text-white px-8 py-4 rounded-xl">
-    Contáctanos ahora
-  </button>
-</section>
-
-<!-- FORMULARIO -->
-<section id="contacto" class="py-20 bg-gray-100">
-  <div class="max-w-xl mx-auto px-6">
-
-    <h2 class="text-2xl font-bold text-center mb-6 text-blue-900">Contáctanos</h2>
-
-    <form id="form" class="space-y-4">
-
-      <input type="text" placeholder="Empresa" class="w-full p-3 border rounded-lg" required>
-      <input type="text" placeholder="Nombre" class="w-full p-3 border rounded-lg" required>
-      <input type="email" placeholder="Correo" class="w-full p-3 border rounded-lg" required>
-      <input type="tel" placeholder="Teléfono" class="w-full p-3 border rounded-lg" required>
-
-      <textarea placeholder="Mensaje" class="w-full p-3 border rounded-lg"></textarea>
-
-      <button class="w-full bg-blue-600 text-white py-3 rounded-lg">
-        Enviar
-      </button>
-
-    </form>
-
-    <p id="msg" class="text-center mt-4"></p>
-
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer class="text-center py-6 bg-white">
-  <p>© Telecom S.A.</p>
+<footer class="bg-brand-950 text-slate-400 py-12 border-t border-white/10">
+  <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-8 mb-8">
+    <div class="col-span-2">
+      <div class="flex items-center gap-2 mb-4 text-white">
+        <i data-lucide="network" class="w-6 h-6 text-accent-500"></i>
+        <span class="font-display font-bold text-xl tracking-tight">Telecom<span class="text-accent-500">S.A.</span></span>
+      </div>
+      <p class="max-w-sm mb-6">Soluciones en telecomunicaciones para empresas. Innovación, calidad y respuesta inmediata en cada proyecto.</p>
+      <div class="flex gap-4">
+        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white transition-all">
+          <i data-lucide="linkedin" class="w-5 h-5"></i>
+        </a>
+        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white transition-all">
+          <i data-lucide="twitter" class="w-5 h-5"></i>
+        </a>
+        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-600 hover:text-white transition-all">
+          <i data-lucide="facebook" class="w-5 h-5"></i>
+        </a>
+      </div>
+    </div>
+    
+    <div>
+      <h4 class="text-white font-semibold mb-4">Enlaces Rápidos</h4>
+      <ul class="space-y-2">
+        <li><a href="#empresa" class="hover:text-accent-500 transition-colors">Sobre la Empresa</a></li>
+        <li><a href="#servicios" class="hover:text-accent-500 transition-colors">Servicios</a></li>
+        <li><a href="#diferenciadores" class="hover:text-accent-500 transition-colors">Por qué Elegirnos</a></li>
+        <li><a href="#contacto" class="hover:text-accent-500 transition-colors">Contacto</a></li>
+      </ul>
+    </div>
+    
+    <div>
+      <h4 class="text-white font-semibold mb-4">Servicios</h4>
+      <ul class="space-y-2">
+        <li><a href="#" class="hover:text-accent-500 transition-colors">Instalación de Redes</a></li>
+        <li><a href="#" class="hover:text-accent-500 transition-colors">Fibra Óptica</a></li>
+        <li><a href="#" class="hover:text-accent-500 transition-colors">Mantenimiento</a></li>
+        <li><a href="#" class="hover:text-accent-500 transition-colors">Soporte 24/7</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="max-w-7xl mx-auto px-6 pt-8 border-t border-white/10 text-sm text-center md:text-left flex flex-col md:flex-row justify-between items-center">
+    <p>© 2026 Telecom S.A. Todos los derechos reservados.</p>
+    <div class="flex gap-4 mt-4 md:mt-0">
+      <a href="#" class="hover:text-white transition-colors">Políticas de Privacidad</a>
+      <a href="#" class="hover:text-white transition-colors">Términos de Servicio</a>
+    </div>
+  </div>
 </footer>
 
 <script>
-function scrollToForm(){
-  document.getElementById("contacto").scrollIntoView({behavior:"smooth"});
-}
+  // Initialize Icons
+  lucide.createIcons();
 
-document.getElementById("form").addEventListener("submit", function(e){
-  e.preventDefault();
-  document.getElementById("msg").innerText = "Mensaje enviado correctamente";
-});
+  // Scroll Animation Reveal
+  function reveal() {
+    var reveals = document.querySelectorAll(".reveal");
+    for (var i = 0; i < reveals.length; i++) {
+      var windowHeight = window.innerHeight;
+      var elementTop = reveals[i].getBoundingClientRect().top;
+      var elementVisible = 100;
+      if (elementTop < windowHeight - elementVisible) {
+        reveals[i].classList.add("active");
+      }
+    }
+  }
+  window.addEventListener("scroll", reveal);
+  reveal(); // Trigger on load
+
+  // Navbar glass effect on scroll
+  window.addEventListener("scroll", function() {
+    const navbar = document.getElementById("navbar");
+    if (window.scrollY > 50) {
+      navbar.classList.add("shadow-md");
+      navbar.classList.replace("glass-nav", "bg-white/95");
+      navbar.classList.add("backdrop-blur-md");
+    } else {
+      navbar.classList.remove("shadow-md");
+      navbar.classList.replace("bg-white/95", "glass-nav");
+    }
+  });
+
+  // Form submit handler
+  document.getElementById("form").addEventListener("submit", function(e){
+    e.preventDefault();
+    const msg = document.getElementById("msg");
+    msg.classList.remove("hidden");
+    msg.innerHTML = '<i data-lucide="check-circle-2" class="inline w-5 h-5 mr-1"></i> ¡Solicitud enviada con éxito! Nos pondremos en contacto pronto.';
+    lucide.createIcons();
+    this.reset();
+  });
 </script>
 
 </body>
