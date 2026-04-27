@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.ResponseCompression;
 using Operations;
@@ -62,6 +66,34 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+
+var key = Encoding.UTF8.GetBytes("ClaveSecretaXD_2026_SUPER_SEGURA_!$%_JWT");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+});
+
+
+
+
+
+
 var app = builder.Build();
 await new StartServices().StartServicesApp();
 // Configure the HTTP request pipeline.
@@ -83,7 +115,8 @@ if (!app.Environment.IsDevelopment())
     );
 }
 
-
+app.UseAuthentication();   
+app.UseAuthorization();
 
 app.MapControllers();
 app.UseHttpsRedirection();
