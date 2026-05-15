@@ -1,0 +1,411 @@
+# Arquitectura de Seguridad — Grupo-11 (ASP.NET Core Web API)
+
+> **Proyecto:** Grupo-11 | **Framework:** ASP.NET Core 8 (.NET 8) | **Patrón:** Middleware Pipeline + RBAC
+
+---
+
+## 1. Visión General
+
+El sistema implementa **dos capas de seguridad complementarias** sobre el pipeline de ASP.NET Core:
+
+| Capa | Mecanismo | ¿Dónde actúa? |
+|---|---|---|
+| **Capa 1 — Pipeline** | `SessionAuthMiddleware` | Antes de llegar al controlador |
+| **Capa 2 — Acción** | `AuthControllerAttribute` | En cada método del controlador |
+
+Además, el pipeline incorpora **logging** y **manejo global de errores** como infraestructura transversal.
+
+---
+
+## 2. Estructura de Archivos
+
+```
+Grupo-11/
+├── Program.cs                          ← Configuración del pipeline
+│
+├── Middleware/
+│   ├── ErrorHandlingMiddleware.cs      ← Capa 1: captura excepciones globales
+│   ├── LoggingMiddleware.cs            ← Capa 2: registra cada petición
+│   └── SessionAuthMiddleware.cs        ← Capa 3: valida sesión activa
+│
+├── Security/
+│   ├── AuthNetCore.cs                  ← Motor de autenticación (sesiones en memoria)
+│   ├── AuthAttibutes.cs                ← Filtro de permisos por acción
+│   │
+│   ├── Model/
+│   │   ├── LoginRequest.cs             ← DTO de entrada del login
+│   │   ├── UserModel.cs                ← Modelo de usuario autenticado
+│   │   └── Permissions.cs             ← Enum de permisos disponibles
+│   │
+│   ├── Entity/
+│   │   ├── Security_Users.cs           ← Entidad tabla usuarios BD
+│   │   ├── Security_Roles.cs           ← Entidad tabla roles BD
+│   │   ├── Security_Permissions.cs     ← Entidad tabla permisos BD
+│   │   ├── Security_Users_Roles.cs     ← Relación usuario-rol
+│   │   └── Security_Permissions_Roles.cs ← Relación permiso-rol
+│   │
+│   └── Infraestructura/
+│       ├── EntityClass.cs              ← Clase base ORM abstracta
+│       ├── PrimaryKeyAttribute.cs      ← Atributo [PrimaryKey]
+│       ├── OneToManyAttribute.cs       ← Atributo [OneToMany]
+│       └── ManyToOneAttribute.cs       ← Atributo [ManyToOne]
+│
+└── Controllers/
+    ├── SecurityController.cs           ← Endpoints Login / Logout
+    └── UserController.cs               ← Endpoints protegidos (ejemplo)
+```
+
+---
+
+## 3. El Pipeline — Flujo Completo de una Petición
+
+### 3.1 Diagrama del Pipeline
+
+```mermaid
+flowchart TD
+    A["🌐 Cliente HTTP"] -->|"POST /security/login"| B
+
+    subgraph PIPELINE["Pipeline ASP.NET Core — Program.cs"]
+        B["[1] ErrorHandlingMiddleware\ntry-catch global"]
+        B --> C["[2] LoggingMiddleware\nRegistra método + ruta + tiempo"]
+        C --> D["[3] UseHttpsRedirection\nFuerza HTTPS"]
+        D --> E["[4] UseCors\nPolítica AllowAll"]
+        E --> F["[5] UseSwagger\nSolo en Development"]
+        F --> G["[6] UseSession\nHabilita cookies de sesión"]
+        G --> H["[7] SessionAuthMiddleware\n¿Ruta pública? → continúa\n¿Sin sesión válida? → 401"]
+        H --> I["[8] MapControllers\nEnruta al controlador correcto"]
+    end
+
+    subgraph CONTROLADOR["Controlador + Filtros"]
+        I --> J["AuthControllerAttribute\nVerifica permisos del usuario"]
+        J --> K["Método del Controlador\nLógica de negocio"]
+    end
+
+    K -->|"Respuesta"| J
+    J -->|"200 / 403"| I
+    I -->|"Response"| H
+    H -->|"Response"| G
+    G -->|"Response"| F
+    F -->|"Response"| E
+    E -->|"Response"| D
+    D -->|"Response"| C
+    C -->|"Loguea StatusCode"| B
+    B -->|"Response final"| A
+```
+
+### 3.2 Orden Crítico del Pipeline
+
+```
+Request  →  [1] ErrorHandling  →  [2] Logging  →  [3] HTTPS  →  [4] CORS
+         →  [5] Swagger        →  [6] Session  →  [7] SessionAuth
+         →  [8] Controllers    →  Acción
+         ←  Response regresa en ORDEN INVERSO
+```
+
+> [!IMPORTANT]
+> El orden no es aleatorio. Cada posición tiene una razón:
+> - **ErrorHandling primero** → captura errores de TODO lo que viene después
+> - **Session antes de SessionAuth** → la cookie debe estar disponible antes de leerla
+> - **CORS antes de Controllers** → las cabeceras CORS se añaden antes de que el controlador responda
+
+---
+
+## 4. Componentes del Pipeline — Detalle
+
+### 4.1 `ErrorHandlingMiddleware` — Guardián Global
+
+**Archivo:** `Middleware/ErrorHandlingMiddleware.cs`
+
+**¿Qué hace?**
+- Envuelve toda la cadena en un bloque `try-catch`
+- Si cualquier middleware o controlador lanza una excepción no controlada, la captura aquí
+- Devuelve siempre una respuesta JSON uniforme con código `500`
+
+**Flujo interno:**
+```
+try {
+    await _next(context);   ← ejecuta TODO el pipeline
+} catch (Exception ex) {
+    → Log del error
+    → Respuesta JSON: { status: 500, error: "...", detalle: "..." }
+}
+```
+
+**Ejemplo de respuesta en error:**
+```json
+{
+  "status": 500,
+  "error": "Error interno del servidor",
+  "detalle": "Object reference not set to an instance..."
+}
+```
+
+---
+
+### 4.2 `LoggingMiddleware` — Observador del Pipeline
+
+**Archivo:** `Middleware/LoggingMiddleware.cs`
+
+**¿Qué hace?**
+- Registra CADA petición que entra al sistema
+- Mide el tiempo de ejecución con un `Stopwatch`
+- Loguea el resultado DESPUÉS de que la respuesta regresa (orden inverso)
+
+**Flujo interno:**
+```
+→ Log: "[REQUEST]  GET /user | IP: 192.168.1.1"
+await _next(context);       ← cede al siguiente middleware
+← Log: "[RESPONSE] GET /user | Status: 200 | Duración: 42ms"
+```
+
+**Salida en consola (ejemplo):**
+```
+info: [REQUEST]  POST /security/login | IP: ::1
+info: [RESPONSE] POST /security/login | Status: 200 | Duración: 387ms
+```
+
+---
+
+### 4.3 `SessionAuthMiddleware` — Guardián de Sesión
+
+**Archivo:** `Middleware/SessionAuthMiddleware.cs`
+
+**¿Qué hace?**
+- Intercepta TODAS las peticiones antes de que lleguen al controlador
+- Si la ruta es **pública** (lista blanca) → deja pasar sin verificar
+- Si la ruta es **privada** → verifica que exista una sesión activa en `AuthNetCore`
+- Si no hay sesión válida → **cortocircuito**: devuelve `401` sin llamar al siguiente
+
+**Lista blanca de rutas públicas:**
+```csharp
+"/security/login"
+"/swagger"
+"/swagger/index.html"
+"/swagger/v1/swagger.json"
+```
+
+**Diagrama de decisión:**
+```mermaid
+flowchart LR
+    A["Petición llega"] --> B{"¿Ruta pública?"}
+    B -->|"Sí"| C["✅ await _next — continúa"]
+    B -->|"No"| D{"¿Session Key\nexiste y es válida?"}
+    D -->|"Sí"| C
+    D -->|"No"| E["🚫 Cortocircuito\nHTTP 401 JSON"]
+```
+
+**Respuesta de cortocircuito:**
+```json
+{
+  "status": 401,
+  "error": "No autorizado",
+  "detalle": "Debe iniciar sesión para acceder a este recurso"
+}
+```
+
+---
+
+## 5. Motor de Autenticación — `AuthNetCore`
+
+**Archivo:** `Security/AuthNetCore.cs`
+
+Es el **núcleo del sistema de sesiones**. Gestiona un diccionario en memoria que mapea claves de sesión con usuarios autenticados.
+
+```mermaid
+flowchart TD
+    A["Login exitoso"] -->|"Genera GUID"| B["_activeSessions[guid] = UserModel"]
+    B --> C["Devuelve SessionKey al cliente"]
+    C --> D["Cliente guarda SessionKey en cookie"]
+    D --> E["Siguiente petición envía cookie"]
+    E --> F["SessionAuthMiddleware lee cookie"]
+    F --> G["AuthNetCore.Authenticate(key)"]
+    G -->|"Key existe"| H["✅ Continúa"]
+    G -->|"Key no existe"| I["🚫 401"]
+```
+
+### Métodos principales
+
+| Método | Función |
+|---|---|
+| `Login(request, sessionKey)` | Consulta BD, valida credenciales, crea sesión, retorna `{ SessionKey, User }` |
+| `Authenticate(sessionKey)` | Verifica si la key existe en `_activeSessions` |
+| `HavePermission(token, perms[])` | Intersecta permisos del usuario con los requeridos |
+| `ClearSeason(sessionKey)` | Elimina la sesión (Logout) |
+
+### Proceso de Login detallado
+
+```
+1. Recibe { username, password } desde el body
+2. Consulta SQL: SELECT usuario WHERE Nombres=@u OR Mail=@u AND Password=@p AND Estado='Activo'
+3. Si existe → consulta permisos via JOIN:
+      Security_Users_Roles → Security_Permissions_Roles → Security_Permissions
+4. Convierte strings de permisos al enum Permissions
+5. Genera un GUID único como SessionKey
+6. Guarda en _activeSessions[GUID] = UserModel { id, username, permisos[] }
+7. El controlador guarda el GUID en la cookie de sesión HTTP
+8. Retorna { SessionKey, User } al cliente
+```
+
+---
+
+## 6. Autorización por Permisos — `AuthControllerAttribute`
+
+**Archivo:** `Security/AuthAttibutes.cs`
+
+Es un **ActionFilter** de ASP.NET Core MVC. Actúa en la **segunda capa** de seguridad, a nivel de método del controlador (después de que el middleware ya validó la sesión).
+
+**¿Qué hace?**
+1. Lee el `sessionKey` de la cookie de sesión
+2. Llama a `AuthNetCore.Authenticate(token)` → si falla → `401`
+3. Si hay permisos declarados en el atributo, llama a `AuthNetCore.HavePermission()` → si falla → `403`
+
+**Uso en controladores:**
+```csharp
+[HttpGet]
+[AuthController(Permissions.CanViewUsers)]     // Solo usuarios con este permiso
+public IActionResult GetUsers() { ... }
+
+[HttpPost]
+[AuthController(Permissions.CanEditUsers)]     // Solo usuarios con este permiso
+public IActionResult CreateUser(...) { ... }
+```
+
+**Diferencia entre 401 y 403:**
+| Código | Significado | ¿Cuándo? |
+|---|---|---|
+| `401 Unauthorized` | No hay sesión | No está logueado |
+| `403 Forbidden` | Sesión válida pero sin permiso | Logueado pero sin acceso |
+
+---
+
+## 7. Permisos Disponibles
+
+**Archivo:** `Security/Model/Permissions.cs`
+
+```csharp
+public enum Permissions
+{
+    CanViewUsers,         // Ver lista de usuarios
+    CanEditUsers,         // Crear / modificar usuarios
+    CanDeleteUsers,       // Eliminar usuarios
+    CanViewReports,       // Ver reportes
+    CanGenerateReports    // Generar reportes
+}
+```
+
+Los permisos se asignan en la base de datos a través de roles:
+
+```
+Security_Users  →  Security_Users_Roles  →  Security_Roles
+                                         →  Security_Permissions_Roles  →  Security_Permissions
+```
+
+---
+
+## 8. Modelos de Datos
+
+### `LoginRequest` — Entrada del Login
+```csharp
+{ username: string, password: string }
+```
+
+### `UserModel` — Usuario en Sesión
+```csharp
+{
+    Id_User: int,
+    username: string,
+    password: string,      // [JsonIgnore] — nunca se serializa en respuesta
+    SessionKey: string,    // [JsonIgnore] — nunca se serializa en respuesta
+    Permissions: Permissions[]
+}
+```
+
+> [!NOTE]
+> Los campos `password` y `SessionKey` tienen `[JsonIgnore]` para que **nunca** aparezcan en ninguna respuesta JSON — buena práctica de seguridad.
+
+---
+
+## 9. Flujo Completo — Escenario de Login a Endpoint Protegido
+
+```mermaid
+sequenceDiagram
+    actor Cliente
+    participant MW_Error as ErrorHandling MW
+    participant MW_Log as Logging MW
+    participant MW_Auth as SessionAuth MW
+    participant Controller as SecurityController
+    participant AuthCore as AuthNetCore
+    participant BD as SQL Server
+
+    Cliente->>MW_Error: POST /security/login { user, pass }
+    MW_Error->>MW_Log: pasa la petición
+    MW_Log->>MW_Auth: registra entrada
+    MW_Auth->>MW_Auth: ¿Ruta pública? /security/login → SÍ
+    MW_Auth->>Controller: pasa sin verificar sesión
+    Controller->>AuthCore: Login(request, sessionKey)
+    AuthCore->>BD: SELECT usuario + permisos
+    BD-->>AuthCore: UserModel con permisos[]
+    AuthCore-->>Controller: { SessionKey: "abc-123", User: {...} }
+    Controller->>Controller: Session.SetString("sessionKey", "abc-123")
+    Controller-->>Cliente: 200 OK { SessionKey, User }
+
+    Note over Cliente: Segunda petición con sesión
+
+    Cliente->>MW_Error: GET /user (cookie sessionKey=abc-123)
+    MW_Error->>MW_Log: pasa la petición
+    MW_Log->>MW_Auth: registra entrada
+    MW_Auth->>AuthCore: Authenticate("abc-123")
+    AuthCore-->>MW_Auth: true (sesión válida)
+    MW_Auth->>Controller: pasa al UserController
+    Controller->>Controller: [AuthController(CanViewUsers)] verifica permiso
+    Controller->>AuthCore: HavePermission("abc-123", [CanViewUsers])
+    AuthCore-->>Controller: true
+    Controller-->>Cliente: 200 OK { mensaje, data }
+```
+
+---
+
+## 10. Resumen Visual de Capas
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    CLIENTE HTTP                              │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ Request
+┌──────────────────────────▼──────────────────────────────────┐
+│  [1] ErrorHandlingMiddleware  — try/catch global            │
+│  [2] LoggingMiddleware        — registro de petición        │
+│  [3] UseHttpsRedirection      — fuerza HTTPS                │
+│  [4] UseCors                  — cabeceras CORS              │
+│  [5] UseSwagger               — docs (solo dev)             │
+│  [6] UseSession               — habilita cookies            │
+│  [7] SessionAuthMiddleware    — ¿sesión válida? → continúa  │
+│                               — ¿sin sesión?  → 401         │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ (solo si hay sesión)
+┌──────────────────────────▼──────────────────────────────────┐
+│  CONTROLADOR MVC                                            │
+│  [AuthControllerAttribute]  — ¿tiene permiso? → ejecuta    │
+│                             — ¿sin permiso?   → 403         │
+│  Método de acción           — lógica de negocio             │
+└─────────────────────────────────────────────────────────────┘
+                           │ Response (orden inverso)
+┌──────────────────────────▼──────────────────────────────────┐
+│                    CLIENTE HTTP                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 11. Checklist de Seguridad Implementada
+
+- [x] Contraseñas nunca expuestas en respuestas JSON (`[JsonIgnore]`)
+- [x] SessionKey nunca expuesta en respuestas JSON (`[JsonIgnore]`)
+- [x] Validación de sesión en nivel de pipeline (antes del controlador)
+- [x] Validación de permisos granular por acción
+- [x] Manejo centralizado de errores (sin stack traces al cliente)
+- [x] CORS configurado desde el arranque
+- [x] Logging de todas las peticiones y respuestas
+- [x] Solo usuarios con `Estado = 'Activo'` en BD pueden autenticarse
+- [x] Sesiones con timeout de 40 minutos
+- [x] Rutas públicas explícitamente definidas (lista blanca)
