@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ETLService")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8c0847fdc96f0c8a0a9853a6397c8f0229a983b7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f96d86c438bba3f9c4cb9c7a5a2877320ef373db")]
 [assembly: System.Reflection.AssemblyProductAttribute("ETLService")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ETLService")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
