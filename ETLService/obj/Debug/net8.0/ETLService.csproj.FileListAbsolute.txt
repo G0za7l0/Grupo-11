@@ -178,3 +178,11 @@ d:\repos\NETCORE\ETLService\ETLService\obj\Debug\net8.0\refint\ETLService.dll
 d:\repos\NETCORE\ETLService\ETLService\obj\Debug\net8.0\ETLService.pdb
 d:\repos\NETCORE\ETLService\ETLService\obj\Debug\net8.0\ETLService.genruntimeconfig.cache
 d:\repos\NETCORE\ETLService\ETLService\obj\Debug\net8.0\ref\ETLService.dll
+C:\Users\angel\OneDrive\Desktop\Optativa I\Grupo-11\ETLService\obj\Debug\net8.0\ETLService.csproj.AssemblyReference.cache
+C:\Users\angel\OneDrive\Desktop\Optativa I\Grupo-11\ETLService\obj\Debug\net8.0\ETLService.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\angel\OneDrive\Desktop\Optativa I\Grupo-11\ETLService\obj\Debug\net8.0\ETLService.AssemblyInfoInputs.cache
+C:\Users\angel\OneDrive\Desktop\Optativa I\Grupo-11\ETLService\obj\Debug\net8.0\ETLService.AssemblyInfo.cs
+C:\Users\angel\OneDrive\Desktop\Optativa I\Grupo-11\ETLService\obj\Debug\net8.0\ETLService.csproj.CoreCompileInputs.cache
+C:\Users\angel\OneDrive\Desktop\Optativa I\Grupo-11\ETLService\obj\Debug\net8.0\ETLService.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\angel\OneDrive\Desktop\Optativa I\Grupo-11\ETLService\obj\Debug\net8.0\ETLService.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\angel\OneDrive\Desktop\Optativa I\Grupo-11\ETLService\obj\Debug\net8.0\ETLService.sourcelink.json
